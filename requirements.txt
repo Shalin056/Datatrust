@@ -1,0 +1,7 @@
+# requirements.txt — Python libraries DataTrust needs to RUN.
+# Versions are pinned (==) so everyone, including GitHub Actions, gets the exact same setup.
+# More libraries (pyspark, fastapi, duckdb ...) are added in later steps.
+
+requests==2.34.2        # makes HTTP calls to the Hugging Face API
+python-dotenv==1.2.4    # reads secrets like HF_TOKEN from the .env file
+PyYAML==6.0.3           # reads our settings files in configs/

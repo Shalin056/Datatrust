@@ -1,0 +1,24 @@
+# settings.yaml — general DataTrust settings you can change without editing code.
+# Read by: datatrust/config.py
+
+collect:
+  # How many datasets to collect, most-downloaded first.
+  # Can be overridden by MAX_DATASETS in .env, or by --limit on the command line.
+  max_datasets: 5000
+  # How many datasets the HF API returns per page (1000 is its maximum).
+  page_size: 1000
+  # Which order to collect in. "downloads" gives the most-used datasets first.
+  sort_by: downloads
+  # Cards longer than this are cut short, so one giant README can't bloat our files.
+  max_card_chars: 200000
+
+paths:
+  raw_dir: data/raw
+  clean_dir: data/clean
+  output_dir: data/output
+
+http:
+  # Seconds to wait for a reply before giving up on one request.
+  timeout_seconds: 30
+  # How many times to try a request before giving up for good.
+  max_retries: 5

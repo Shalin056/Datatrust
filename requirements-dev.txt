@@ -1,0 +1,6 @@
+# requirements-dev.txt — extra libraries only needed while DEVELOPING (not to run the app).
+# Install with: pip install -r requirements-dev.txt   (it also installs requirements.txt)
+
+-r requirements.txt
+pytest==9.1.1           # runs our automatic tests
+ruff==0.17.1            # "linter": checks code for mistakes and messy style
