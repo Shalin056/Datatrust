@@ -1,0 +1,58 @@
+# .gitignore — tells Git which files and folders it must NEVER save.
+# Why: keeps secrets, big data files, and auto-generated junk out of the repo.
+
+# ---------- Secrets (most important section) ----------
+# Real tokens live in .env. Only .env.example (no real values) is committed.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# ---------- Data (too big for Git; rebuilt by the pipeline) ----------
+# Keep the folders (via .gitkeep) but ignore everything inside them.
+data/raw/*
+data/clean/*
+data/output/*
+!data/raw/.gitkeep
+!data/clean/.gitkeep
+!data/output/.gitkeep
+# data/samples/ and data/labels/ ARE committed on purpose (small + needed for tests).
+
+# Website copies of the reports are generated at build time.
+web/public/data/
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# ---------- Spark ----------
+spark-warehouse/
+metastore_db/
+derby.log
+*.crc
+
+# ---------- JavaScript / website ----------
+node_modules/
+web/dist/
+.vite/
+
+# ---------- Editors and operating systems ----------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Logs ----------
+*.log
+logs/

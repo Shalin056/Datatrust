@@ -1,0 +1,15 @@
+# .gitattributes — tells Git how to handle line endings.
+# Why: Windows ends lines with CRLF, Linux with LF. Docker and GitHub Actions run Linux,
+# and a shell script saved with CRLF breaks there. Storing LF in the repo avoids that.
+
+# Default: let Git normalize text files to LF inside the repo.
+* text=auto eol=lf
+
+# Windows-only scripts keep Windows line endings.
+*.ps1 text eol=crlf
+
+# Binary files: never touch them.
+*.parquet binary
+*.png binary
+*.jpg binary
+*.ico binary
