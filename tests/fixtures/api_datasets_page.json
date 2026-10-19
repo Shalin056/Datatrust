@@ -1,0 +1,68 @@
+[
+  {
+    "_id": "621ffdd236468d709f1835cf",
+    "id": "huggingface/documentation-images",
+    "author": "huggingface",
+    "cardData": {
+      "license": "cc-by-nc-sa-4.0"
+    },
+    "disabled": false,
+    "gated": false,
+    "lastModified": "2026-10-16T13:14:30.000Z",
+    "likes": 231,
+    "private": false,
+    "sha": "2dd75e791509da38222ecbd3bfaa2b44ac658ef4",
+    "description": "\n\t\n\t\t\n\t\n\t\n\t\tThis dataset contains images used in the documentation of HuggingFace's libraries.\n\t\n\nHF Team: Please make sure you optimize the assets before uploading them.\nMy favorite tool for this is https://tinypng.com/.\n",
+    "downloads": 4957025,
+    "tags": [
+      "license:cc-by-nc-sa-4.0",
+      "size_categories:n<1K",
+      "format:imagefolder",
+      "modality:image",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ],
+    "createdAt": "2022-03-02T23:29:22.000Z",
+    "key": ""
+  },
+  {
+    "_id": "675d7e29e24babdf1842d270",
+    "id": "m-a-p/FineFineWeb",
+    "author": "m-a-p",
+    "cardData": {
+      "license": "apache-2.0",
+      "task_categories": [
+        "text-classification",
+        "text2text-generation",
+        "text-generation"
+      ],
+      "language": [
+        "en"
+      ],
+      "size_categories": [
+        "n>1T"
+      ]
+    },
+    "disabled": false,
+    "gated": false,
+    "lastModified": "2024-12-19T11:34:03.000Z",
+    "likes": 239,
+    "private": false,
+    "sha": "7fd92dc825a75cbff271a5a52eea0eda91a2c112",
+    "description": "\n\t\n\t\t\n\t\n\t\n\t\tFineFineWeb: A Comprehensive Study on Fine-Grained Domain Web Corpus\n\t\n\narXiv: Coming Soon\nProject Page: Coming Soon\nBlog: Coming Soon\n\n\t\n\t\t\n\t\n\t\n\t\tData Statistics\n\t\n\n\n\t\n\t\t\nDomain (#tokens/#samples)\nIteration 1 Tokens\nIteration 2 Tokens\nIteration 3 Tokens\nTotal Tokens\nIteration 1 Count\nIteration 2 Count\nIteration 3 Count\nTotal Count\n\n\n\t\t\naerospace\n5.77B\n261.63M\n309.33M\n6.34B\n9100000\n688505\n611034\n10399539\n\n\nagronomy\n13.08B\n947.41M\n229.04M\n14.26B\n15752828\n2711790\n649404\n19114022… See the full description on the dataset page: https://huggingface.co/datasets/m-a-p/FineFineWeb.",
+    "downloads": 4004565,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:text-generation",
+      "language:en",
+      "license:apache-2.0",
+      "size_categories:1B<n<10B",
+      "modality:tabular",
+      "modality:text",
+      "region:us"
+    ],
+    "createdAt": "2024-12-14T12:46:33.000Z",
+    "key": ""
+  }
+]

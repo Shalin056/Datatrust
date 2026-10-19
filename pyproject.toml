@@ -1,0 +1,21 @@
+# pyproject.toml — project info plus settings for our tools (pytest and ruff).
+
+[project]
+name = "datatrust"
+version = "0.0.1"
+description = "Trust reports for Hugging Face datasets"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+# Look for tests in the tests/ folder.
+testpaths = ["tests"]
+# Let tests do "import datatrust" without installing the package.
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+# E/F = common errors, I = sorted imports, B = likely bugs.
+select = ["E", "F", "I", "B"]
