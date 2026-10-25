@@ -1,0 +1,6 @@
+# requirements-pipeline.txt — extra libraries for the Spark data pipeline.
+# These are installed INSIDE the Docker image (docker/spark.Dockerfile), not in your
+# Windows .venv, because Spark needs Java and Linux to run smoothly.
+
+-r requirements.txt
+pyspark==4.1.3          # Apache Spark for Python: processes big tables using all CPU cores

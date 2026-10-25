@@ -1,0 +1,22 @@
+# docker-compose.yml — one place that says HOW to run our containers, so you don't have
+# to type long docker commands. Run a pipeline command like this:
+#   docker compose run --rm pipeline python -m datatrust.pipelines.inspect_raw
+#
+# Uses: docker/spark.Dockerfile, .env (optional)
+# Used by: you (command line); the API service is added here in Step 7.
+
+services:
+  pipeline:
+    build:
+      context: .
+      dockerfile: docker/spark.Dockerfile
+    image: datatrust-pipeline
+    # Mount the project folder into the container, so it can read code + data/
+    # and write results back to data/ on your laptop.
+    volumes:
+      - .:/app
+    working_dir: /app
+    # Pass HF_TOKEN etc. into the container. "required: false" = fine if .env is missing.
+    env_file:
+      - path: .env
+        required: false
