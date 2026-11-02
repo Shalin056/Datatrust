@@ -1,0 +1,81 @@
+# licenses.yaml — what each Hugging Face license ID means for someone who wants to use the data.
+# Read by: datatrust/pipelines/normalize_license.py
+#
+# Every license gets ONE category. Categories, from least to most restrictive:
+#   public_domain   no conditions at all
+#   permissive      use for anything, just give credit
+#   restricted_use  commercial use OK, but some uses are banned (e.g. "RAIL" AI licenses)
+#   share_alike     anything you build from it must use the SAME license ("copyleft")
+#   non_commercial  no commercial use
+#   no_derivatives  you may not change it or build new datasets from it
+#   custom          "other": the owner wrote their own license, a human must read it
+#   unclear         "unknown" or too vague to tell
+#
+# This is our best simple reading of each license, NOT legal advice.
+# HF's full list of allowed IDs: https://huggingface.co/docs/hub/repositories-licenses
+
+licenses:
+  # ---------- public_domain ----------
+  cc0-1.0:            {name: "Creative Commons Zero 1.0", category: public_domain}
+  unlicense:          {name: "The Unlicense", category: public_domain}
+  pddl:               {name: "ODC Public Domain Dedication and License", category: public_domain}
+
+  # ---------- permissive ----------
+  apache-2.0:         {name: "Apache License 2.0", category: permissive}
+  mit:                {name: "MIT License", category: permissive}
+  bsd:                {name: "BSD License", category: permissive}
+  bsd-2-clause:       {name: "BSD 2-Clause", category: permissive}
+  bsd-3-clause:       {name: "BSD 3-Clause", category: permissive}
+  bsd-3-clause-clear: {name: "BSD 3-Clause Clear", category: permissive}
+  afl-3.0:            {name: "Academic Free License 3.0", category: permissive}
+  wtfpl:              {name: "WTFPL", category: permissive}
+  cc-by-2.0:          {name: "Creative Commons Attribution 2.0", category: permissive}
+  cc-by-2.5:          {name: "Creative Commons Attribution 2.5", category: permissive}
+  cc-by-3.0:          {name: "Creative Commons Attribution 3.0", category: permissive}
+  cc-by-4.0:          {name: "Creative Commons Attribution 4.0", category: permissive}
+  odc-by:             {name: "Open Data Commons Attribution", category: permissive}
+  cdla-permissive-1.0: {name: "Community Data License Agreement Permissive 1.0", category: permissive}
+  cdla-permissive-2.0: {name: "Community Data License Agreement Permissive 2.0", category: permissive}
+  etalab-2.0:         {name: "Etalab Open License 2.0", category: permissive}
+  openmdw-1.1:        {name: "OpenMDW License 1.1", category: permissive}
+
+  # ---------- restricted_use ----------
+  openrail:           {name: "Open RAIL", category: restricted_use}
+  openrail++:         {name: "Open RAIL++", category: restricted_use}
+  creativeml-openrail-m: {name: "CreativeML Open RAIL-M", category: restricted_use}
+  bigscience-bloom-rail-1.0: {name: "BigScience BLOOM RAIL 1.0", category: restricted_use}
+  c-uda:              {name: "Computational Use of Data Agreement", category: restricted_use}
+
+  # ---------- share_alike ----------
+  cc-by-sa-3.0:       {name: "Creative Commons Attribution-ShareAlike 3.0", category: share_alike}
+  cc-by-sa-4.0:       {name: "Creative Commons Attribution-ShareAlike 4.0", category: share_alike}
+  gpl:                {name: "GNU General Public License", category: share_alike}
+  gpl-2.0:            {name: "GNU General Public License 2.0", category: share_alike}
+  gpl-3.0:            {name: "GNU General Public License 3.0", category: share_alike}
+  lgpl-3.0:           {name: "GNU Lesser General Public License 3.0", category: share_alike}
+  agpl-3.0:           {name: "GNU Affero General Public License 3.0", category: share_alike}
+  gfdl:               {name: "GNU Free Documentation License", category: share_alike}
+  odbl:               {name: "Open Database License", category: share_alike}
+  cdla-sharing-1.0:   {name: "Community Data License Agreement Sharing 1.0", category: share_alike}
+
+  # ---------- non_commercial ----------
+  cc-by-nc-2.0:       {name: "Creative Commons Attribution-NonCommercial 2.0", category: non_commercial}
+  cc-by-nc-3.0:       {name: "Creative Commons Attribution-NonCommercial 3.0", category: non_commercial}
+  cc-by-nc-4.0:       {name: "Creative Commons Attribution-NonCommercial 4.0", category: non_commercial}
+  cc-by-nc-sa-2.0:    {name: "Creative Commons Attribution-NonCommercial-ShareAlike 2.0", category: non_commercial}
+  cc-by-nc-sa-3.0:    {name: "Creative Commons Attribution-NonCommercial-ShareAlike 3.0", category: non_commercial}
+  cc-by-nc-sa-4.0:    {name: "Creative Commons Attribution-NonCommercial-ShareAlike 4.0", category: non_commercial}
+  fair-noncommercial-research-license: {name: "FAIR Noncommercial Research License", category: non_commercial}
+  apple-amlr:         {name: "Apple Machine Learning Research Model License", category: non_commercial}
+
+  # ---------- no_derivatives ----------
+  cc-by-nd-4.0:       {name: "Creative Commons Attribution-NoDerivatives 4.0", category: no_derivatives}
+  cc-by-nc-nd-3.0:    {name: "Creative Commons Attribution-NonCommercial-NoDerivatives 3.0", category: no_derivatives}
+  cc-by-nc-nd-4.0:    {name: "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0", category: no_derivatives}
+
+  # ---------- custom / unclear ----------
+  other:              {name: "Custom license (see dataset card)", category: custom}
+  unknown:            {name: "Unknown", category: unclear}
+  # Plain "cc" does not say WHICH Creative Commons license, and they range from
+  # public domain to non-commercial-no-derivatives, so we cannot tell.
+  cc:                 {name: "Creative Commons (version not stated)", category: unclear}
