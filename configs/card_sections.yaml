@@ -1,0 +1,67 @@
+# card_sections.yaml — which README headings count as which kind of section.
+# Read by: datatrust/pipelines/parse_cards.py
+#
+# A heading belongs to a section if it CONTAINS one of the keywords as whole words,
+# after we lowercase it and remove emojis/punctuation/numbering
+# ("## 📚 1. Citation Information" -> "citation information" -> matches "citation").
+#
+# ORDER MATTERS: sections are checked top to bottom and the first match wins.
+# Example: "Licensing Information" must hit "license" before anything else.
+# Keywords were chosen from the most common headings in our first 3,047 real cards.
+
+sections:
+  license:
+    - license
+    - licence
+    - licensing
+    - terms of use
+  citation:
+    - citation
+    - cite
+    - bibtex
+    - reference
+    - references
+  limitations:
+    - limitation
+    - limitations
+    - bias
+    - biases
+    - risks
+    - considerations for using the data
+    - ethical considerations
+    - social impact
+    - disclaimer
+  sources:
+    - source data
+    - sources
+    - dataset creation
+    - data collection
+    - curation rationale
+    - provenance
+    - origin
+    - collection
+  uses:
+    - use
+    - uses
+    - usage
+    - how to use
+    - intended use
+  structure:
+    - dataset structure
+    - data structure
+    - data fields
+    - data splits
+    - data instances
+    - schema
+    - data format
+    - dataset format
+    - structure
+  description:
+    - dataset description
+    - dataset summary
+    - dataset details
+    - description
+    - summary
+    - overview
+    - introduction
+    - about
