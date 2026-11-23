@@ -15,16 +15,17 @@ _Last updated: 2026-11-23_
 | | |
 |---|---|
 | **Project** | DataTrust — a trust report (0–100 score) for every Hugging Face dataset |
-| **Current step** | Step 4 — Clean and store the data (sub-steps 4.1–4.4 done, 4.5 next) |
-| **Current branch** | `feature/cleaning` — 12 commits so far (+5 to make for Step 4.4); not pushed yet (pushed + merged at Step 4.7) |
-| **Tests** | 82 passing (`pytest`), lint clean (`ruff check .`) |
+| **Current step** | Step 4 — Clean and store the data (sub-steps 4.1–4.5 done, 4.6 next) |
+| **Current branch** | `feature/cleaning` — 17 commits so far (+4 to make for Step 4.5); not pushed yet (pushed + merged at Step 4.7) |
+| **Tests** | 91 passing (`pytest`), lint clean (`ruff check .`) |
 | **Data collected** | Top 5,000 HF datasets by downloads + 5,000 README cards (54.5 MB, 2026-10-18) |
+| **Clean data** | `data/clean/datasets.parquet` — 5,000 rows, 32 columns, 2.3 MB (Step 4.5) |
 | **Last version tag** | none yet — `v0.1.0` comes at the end of Step 4 |
-| **Next action** | Step 4.5 — Spark cleaning job: raw JSONL → clean Parquet |
+| **Next action** | Step 4.6 — `likely_not_a_dataset` flag + Spark tests in Docker |
 
 ### Waiting on you
-- [ ] Make the 5 commits for Step 4.4 — the last one adds this handbook, which is still untracked
-      (see [Step 4.4](#step-44--licenses-written-in-readme-text--2026-11-23)).
+- [ ] Make the 4 commits for Step 4.5 (3 code commits + this handbook update)
+      (see [Step 4.5](#step-45--spark-cleaning-job-raw-jsonl--clean-parquet--2026-11-23)).
 - [ ] Decide which optional AI features to include ([section 30](#30-rag-mcp-and-embeddings-in-datatrust)).
 - [ ] Later (after Step 10): decide whether to add an optional AWS or Google Cloud "mirror" ([section 25](#25-steps-still-to-do)).
 - [ ] Optional side work: confirm the Windows PySpark practice setup works ([section 28](#28-side-work-pyspark-on-windows-for-practice)).
@@ -264,7 +265,7 @@ Steps are split into small sub-steps (1–3 files each), each with a code walkth
 | 1 | Project plan + folder structure | — | — | ✅ |
 | 2 | Git, GitHub, first commit | `main` | — | ✅ |
 | 3 | Collect the data | `feature/collector` | — | ✅ (PR #1) |
-| 4 | Clean and store the data | `feature/cleaning` | **v0.1.0** | 🔄 4.1–4.4 done |
+| 4 | Clean and store the data | `feature/cleaning` | **v0.1.0** | 🔄 4.1–4.5 done |
 | 5 | Lineage, license-conflict, duplicate, health checks | `feature/lineage`, `feature/license-checks`, `feature/duplicates`, `feature/health` | **v0.2.0** | ⏳ |
 | 6 | Trust score | `feature/trust-score` | **v0.3.0** | ⏳ |
 | 7 | API | `feature/api` | **v0.4.0** | ⏳ |
@@ -283,8 +284,8 @@ Tests are written **alongside** every step; Step 9 adds automation (CI), coverag
 | 4.2 | License IDs → plain categories | ✅ | 3 |
 | 4.3 | Split README cards into sections | ✅ | 3 |
 | 4.4 | Find licenses written inside README text | ✅ | 4 (+ handbook) |
-| 4.5 | Spark cleaning job: raw JSONL → clean Parquet | ⏭️ **Next** | — |
-| 4.6 | `likely_not_a_dataset` flag + Spark tests in Docker | ⏳ | — |
+| 4.5 | Spark cleaning job: raw JSONL → clean Parquet | ✅ | 3 (+ handbook) |
+| 4.6 | `likely_not_a_dataset` flag + Spark tests in Docker | ⏭️ **Next** | — |
 | 4.7 | Push, PR, merge, tag `v0.1.0` | ⏳ | — |
 
 ## 14. Git and version-control rules
@@ -376,6 +377,7 @@ python -m datatrust.collector.run_collect         # collect (options: --limit N,
 # ---- Docker (open Docker Desktop first) ----
 docker compose build pipeline                     # build/refresh the Spark image
 docker compose run --rm pipeline python -m datatrust.pipelines.inspect_raw
+docker compose run --rm pipeline python -m datatrust.pipelines.clean_metadata   # raw → data/clean/datasets.parquet
 docker compose run --rm pipeline python -c "import pyspark; print(pyspark.__version__)"
 
 # ---- Quick data checks (PowerShell) ----
@@ -439,7 +441,8 @@ datatrust/
 │   │   ├── normalize_license.py  ✅ License tags → IDs + one category
 │   │   ├── parse_cards.py        ✅ README → sections with real content
 │   │   ├── license_from_text.py  🆕✅ Licenses written in README text (Step 4.4)
-│   │   ├── clean_metadata.py     ⏳ Spark job: raw JSONL → clean Parquet (Step 4.5)
+│   │   ├── clean_rules.py        🆕✅ Per-dataset cleaning logic, plain Python (Step 4.5)
+│   │   ├── clean_metadata.py     ✅ Spark job: raw JSONL → clean Parquet (Step 4.5)
 │   │   └── run_pipeline.py       ⏳ Runs clean → checks → score in order
 │   │
 │   ├── lineage/                  STEP 5a — "built from" family tree
@@ -482,7 +485,7 @@ datatrust/
 │
 ├── data/                         Data (big files NOT in Git)
 │   ├── raw/                      ✅ datasets.jsonl + cards.jsonl (gitignored, 54.5 MB)
-│   ├── clean/                    ✅ folder (Parquet arrives in 4.5)
+│   ├── clean/                    ✅ datasets.parquet (5,000 rows, 2.3 MB, gitignored)
 │   ├── output/                   ✅ folder (scores/reports later)
 │   ├── samples/                  ✅ folder (small committed samples later)
 │   └── labels/                   ✅ folder; lineage_gold.csv + LABELING_GUIDE.md ⏳ (Step 5)
@@ -504,6 +507,7 @@ datatrust/
 │   ├── test_normalize_license.py ✅ 12 tests
 │   ├── test_parse_cards.py       ✅ 16 tests
 │   ├── test_license_from_text.py 🆕✅ 20 tests
+│   ├── test_clean_rules.py       🆕✅ 9 tests
 │   └── test_extract_links.py, test_license_conflicts.py, test_duplicates.py,
 │       test_health.py, test_trust_score.py, test_api.py      ⏳
 │
@@ -537,14 +541,16 @@ datatrust/
 | Unit testing with fakes | pytest, fixtures, fake sessions, monkeypatch, `tmp_path` | Steps 3–4 | ✅ |
 | Linting | ruff | Steps 3+ | ✅ |
 | Docker & Compose | Images, Dockerfiles, layer caching, volumes, `.dockerignore` | Step 4.1 | ✅ |
-| Apache Spark (PySpark) | DataFrames, explicit schemas, `groupBy`, `explode`, local mode, partitions | Step 4.1 | ✅ (more in 4.5+) |
+| Apache Spark (PySpark) | DataFrames, explicit schemas, `groupBy`, `explode`, local mode, partitions, joins, UDFs, `cache`, timestamps | Steps 4.1, 4.5 | ✅ |
 | Data profiling | Looking at real data before writing rules | Steps 3–4 | ✅ |
 | Regular expressions | Text patterns for headings, word boundaries | Step 4.3 | ✅ |
 | Rule-based text extraction | Alias tables, text normalization, longest-match-first, signal phrases | Step 4.4 | ✅ |
 | Manual result review | Reading every output on real data to find error patterns | Step 4.4 | ✅ |
 | Markdown parsing | Front matter, headings, code blocks | Step 4.3 | ✅ |
 | Dataset licensing knowledge | Permissive / share-alike / non-commercial / no-derivatives | Step 4.2 | ✅ |
-| Data cleaning → Parquet | Typed, compressed column tables | Step 4.5 | ⏳ |
+| Data cleaning → Parquet | Typed, compressed column tables written by Spark | Step 4.5 | ✅ |
+| Data quality checks | Row counts, unique keys, required fields checked before saving | Step 4.5 | ✅ |
+| Separating logic from the engine | Plain-Python rules tested on Windows, called by Spark | Steps 4.2–4.5 | ✅ |
 | Graph building | Lineage nodes/edges, walking a graph | Step 5 | ⏳ |
 | Similarity search | MinHash LSH for near-duplicates at scale | Step 5 | ⏳ |
 | Evaluation metrics | Precision and recall on a hand-labeled set | Step 5 | ⏳ |
@@ -571,6 +577,8 @@ datatrust/
 | Backoff (exponential) | Waiting longer after each failed try (2s, 4s, 8s…) so a struggling server can recover. |
 | Branch | A separate line of work in Git so `main` always stays working. |
 | Cache (Docker layer) | Docker remembers finished build steps and skips them next time. |
+| `cache()` (Spark) | Keep a computed table in memory so later steps reuse it instead of recomputing it. |
+| `coalesce(1)` (Spark) | Merge all partitions into one before writing, so the output is a single file. (Not the same as `F.coalesce`, which picks the first non-empty value.) |
 | Commit | A saved snapshot of your files with a message. |
 | Container / Image | An image is a packaged Linux "box"; a container is one running copy of it. |
 | DataFrame | A table with named columns that Spark spreads across CPU cores. |
@@ -589,6 +597,7 @@ datatrust/
 | Front matter | The YAML block between the first two `---` lines of a card. |
 | HDFS / Hadoop | A system for spreading files across many computers (not needed here). |
 | JSONL | A file with one JSON object per line. |
+| Left join | Combine two tables by a shared key, keeping every row of the left table even if the right has no match. |
 | Lineage | Which dataset was built from which — the family tree. |
 | Linter | A tool that checks code for mistakes and messy style. |
 | Local mode (`local[*]`) | Spark running on one computer using all its cores. |
@@ -604,7 +613,9 @@ datatrust/
 | Schema | The list of columns in a table and the type of each. |
 | Signal phrase | A phrase that changes the meaning of a License section ("each part keeps its own license"). |
 | Schema inference | Spark guessing the schema by reading the data (it crashed on ours). |
+| Timestamp | A real date-and-time value (not text), so you can compare and subtract dates. |
 | Token | A password-like key that lets a program use your account. |
+| UDF | User-Defined Function — your own Python function that Spark runs on every row. |
 | Virtual environment | A private set of Python libraries for one project. |
 | Word boundary (`\b`) | Regex marker so "use" matches the word "use" but not "because". |
 | YAML | A simple text format for settings and tables. |
@@ -853,6 +864,58 @@ test: add license-from-text tests
 docs: add project handbook
 ```
 
+### Step 4.5 — Spark cleaning job: raw JSONL → clean Parquet ✅ (2026-11-23)
+
+**Goal:** one clean, typed table with one row per dataset, combining everything from 4.1–4.4, saved as
+Parquet in `data/clean/datasets.parquet`. Every later step reads this table instead of the raw files.
+
+**What the data showed first:** `source_datasets` (the "built from" field) is always a list, often just
+`["original"]` (268 datasets fill it); `gated` is `false`, `auto` (121) or `manual` (27); the most useful
+tag kinds are `language`, `modality`, `size_categories`, `task_categories`, `arxiv`.
+
+**How the code works:**
+- `datatrust/pipelines/clean_rules.py` (plain Python, testable on Windows):
+  - `load_all_rules()` — loads `licenses.yaml`, `license_aliases.yaml`, `card_sections.yaml` once.
+  - `tag_values()` — `"language:en"` → `"en"` for one tag kind.
+  - `parse_card_data()` — turns the card-header JSON text back into a dict; broken JSON → `{}` (never crashes).
+  - `source_datasets_from()` — always returns a list.
+  - `build_clean_fields()` — **the main function**: tags → languages, task categories, modalities, size,
+    arXiv IDs; licenses (tags first, README text only without tags, then `normalize_license`); card sections,
+    word count, `description_text` and `sources_text` (cut to 10,000 characters). A card whose download did
+    not end in `ok` is never parsed.
+- `datatrust/pipelines/clean_metadata.py` (the Spark job):
+  - `read_raw()` — both JSONL files with the explicit schemas from 4.1.
+  - `join_cards()` — **left join** on `dataset_id`, so every dataset is kept even without a card row.
+  - `add_clean_fields()` — wraps `build_clean_fields()` in a **UDF** so Spark runs it for every row;
+    `CLEAN_FIELDS_SCHEMA` tells Spark the shape of the result in advance.
+  - `select_final_columns()` — real **timestamps** (`to_timestamp`), `dataset_name`, `days_since_update`
+    (`datediff` between collection day and last update), `is_gated`, missing counts → 0, then all clean fields.
+  - `check_quality()` — **data quality checks** that stop the job: same row count as the raw file, no
+    duplicate `dataset_id`, no empty `dataset_id`.
+  - `cache()` keeps the result in memory so the checks, the write and the summary don't re-run the slow
+    Python step; `coalesce(1)` writes one Parquet file instead of many small ones.
+- `tests/test_clean_rules.py` — 9 tests (tags, bad JSON, tags-beat-text, no card, failed download, `other` name).
+
+**Output:** `data/clean/datasets.parquet` — 5,000 rows, 32 columns, **2.3 MB** (raw JSONL: 54.5 MB),
+0 unreadable dates. A Spark "folder" holding one `part-….snappy.parquet` file plus `_SUCCESS` and `.crc`
+check files. Not in Git (`data/clean/*` is ignored).
+
+**Commands:**
+```
+pytest            # 91 passed
+ruff check .      # All checks passed!
+docker compose run --rm pipeline python -m datatrust.pipelines.clean_metadata   # ~50 s
+```
+Harmless new message: `WARN SparkStringUtils: Truncated the string representation of a plan` (Spark shortening
+a long internal description of the job).
+
+**Commits (3):**
+```
+feat: add per-dataset cleaning rules
+test: add cleaning rules tests
+feat: add Spark cleaning job writing clean Parquet
+```
+
 ### Progress report / handbook (2026-11-05)
 
 - Commit `docs: add progress report` added `docs/PROGRESS.md`.
@@ -872,8 +935,7 @@ git status        # must say "nothing to commit, working tree clean"
 
 | Step | Goal | Main files |
 |---|---|---|
-| **4.5** | Spark job: raw JSONL → clean Parquet (real dates, licenses incl. `license_source`, card sections) | `clean_metadata.py` |
-| 4.6 | `likely_not_a_dataset` flag (no README + no card metadata + no description); Spark tests in Docker | flag logic, Spark tests |
+| **4.6** | `likely_not_a_dataset` flag (no README + no card metadata + no description); Spark tests in Docker | flag logic, Spark tests |
 | 4.7 | Push, PR, merge, tag `v0.1.0` | — |
 | 5 | Lineage graph, license conflicts, near-duplicates (MinHash LSH), health; hand-labeled lineage set with precision/recall | `lineage/`, `checks/`, `data/labels/` |
 | 6 | Trust score + "why this score" | `scoring/`, `score_weights.yaml` |
@@ -914,6 +976,10 @@ From the top 5,000 datasets (collected 2026-10-18):
   2,605 to **2,502**. Many of the 103 are compilations or custom terms (custom category 268 → 331).
 - Of 3,047 existing cards: citation 47%, description 38%, structure 35%, license section 33%, uses 21%,
   **sources 18%**, **limitations 15%**; **1,033 (34%) have none of the 7 sections**. Median length 430 words.
+- **Freshness (Step 4.5):** on collection day the median dataset was last updated **122 days** earlier;
+  **1,501 (30%)** had not been updated for over a year; the oldest update was 1,930 days earlier.
+- **Access:** 148 datasets are gated (121 automatic approval, 27 manual approval).
+- **Lineage field:** 268 datasets fill `source_datasets`, often with just `["original"]` (meaning not derived).
 
 Headline for the README: *"Of the 5,000 most-downloaded datasets on Hugging Face, 39% have no documentation at all,
 and only about 1 in 3 has a clearly usable license."*
@@ -933,6 +999,10 @@ and only about 1 in 3 has a clearly usable license."*
   dataset's own (`RMT-team/babilong` → apache-2.0 + bsd); versionless names ("CC BY") are not matched;
   the 99-of-103 accuracy is from one manual review, not an independent labelled set.
 - License text is only read when there are **no tags**; a card whose text disagrees with its tags is not flagged.
+- `days_since_update` is measured from the **collection day** (2026-10-18), not today; it is refreshed when data is re-collected.
+- The cleaning step uses a Python UDF, which is slower than built-in Spark functions; fine at 5,000 rows (~50 s),
+  worth revisiting (e.g. pandas UDFs) if the collection grows to 50k+.
+- `description_text` and `sources_text` are cut at 10,000 characters.
 
 ## 28. Side work: PySpark on Windows for practice
 
@@ -974,6 +1044,8 @@ on `Path`. These come from community repos (third-party binaries — your choice
 - Step 4.4 done: license aliases + signals, `license_from_text.py`, 20 tests; fixed a Step 4.3 bug
   (placeholder links / HTML comments counted as content), 3 tests. Total 82 tests. 103 datasets gain a license.
 - Noticed the handbook file was still untracked; its commit is included in Step 4.4's commit list.
+- Step 4.5 done: `clean_rules.py` (plain Python) + `clean_metadata.py` (Spark job), 9 tests, total 91.
+  First clean table: `data/clean/datasets.parquet` (5,000 rows, 32 columns, 2.3 MB, 0 bad dates).
 
 ### 2026-11-07
 - Question: can RAG, MCP or similar AI ideas be used? Evaluated 8 scenarios against our real data,
