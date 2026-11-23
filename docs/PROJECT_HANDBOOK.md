@@ -15,17 +15,17 @@ _Last updated: 2026-11-23_
 | | |
 |---|---|
 | **Project** | DataTrust — a trust report (0–100 score) for every Hugging Face dataset |
-| **Current step** | Step 4 — Clean and store the data (sub-steps 4.1–4.5 done, 4.6 next) |
-| **Current branch** | `feature/cleaning` — 17 commits so far (+4 to make for Step 4.5); not pushed yet (pushed + merged at Step 4.7) |
-| **Tests** | 91 passing (`pytest`), lint clean (`ruff check .`) |
+| **Current step** | Step 4 — Clean and store the data (sub-steps 4.1–4.6 done, 4.7 next) |
+| **Current branch** | `feature/cleaning` — 21 commits so far (+3 to make for Step 4.6); not pushed yet (pushed + merged at Step 4.7) |
+| **Tests** | Windows: 95 passed + 1 Spark file skipped · Docker: 102 passed (incl. 7 Spark tests) · lint clean |
 | **Data collected** | Top 5,000 HF datasets by downloads + 5,000 README cards (54.5 MB, 2026-10-18) |
-| **Clean data** | `data/clean/datasets.parquet` — 5,000 rows, 32 columns, 2.3 MB (Step 4.5) |
+| **Clean data** | `data/clean/datasets.parquet` — 5,000 rows, 34 columns (incl. `likely_not_a_dataset`), 2.3 MB |
 | **Last version tag** | none yet — `v0.1.0` comes at the end of Step 4 |
-| **Next action** | Step 4.6 — `likely_not_a_dataset` flag + Spark tests in Docker |
+| **Next action** | Step 4.7 — push, Pull Request, merge, tag `v0.1.0` |
 
 ### Waiting on you
-- [ ] Make the 4 commits for Step 4.5 (3 code commits + this handbook update)
-      (see [Step 4.5](#step-45--spark-cleaning-job-raw-jsonl--clean-parquet--2026-11-23)).
+- [ ] Make the 3 commits for Step 4.6
+      (see [Step 4.6](#step-46--likely_not_a_dataset-flag--spark-tests-in-docker--2026-11-23)).
 - [ ] Decide which optional AI features to include ([section 30](#30-rag-mcp-and-embeddings-in-datatrust)).
 - [ ] Later (after Step 10): decide whether to add an optional AWS or Google Cloud "mirror" ([section 25](#25-steps-still-to-do)).
 - [ ] Optional side work: confirm the Windows PySpark practice setup works ([section 28](#28-side-work-pyspark-on-windows-for-practice)).
@@ -265,7 +265,7 @@ Steps are split into small sub-steps (1–3 files each), each with a code walkth
 | 1 | Project plan + folder structure | — | — | ✅ |
 | 2 | Git, GitHub, first commit | `main` | — | ✅ |
 | 3 | Collect the data | `feature/collector` | — | ✅ (PR #1) |
-| 4 | Clean and store the data | `feature/cleaning` | **v0.1.0** | 🔄 4.1–4.5 done |
+| 4 | Clean and store the data | `feature/cleaning` | **v0.1.0** | 🔄 4.1–4.6 done |
 | 5 | Lineage, license-conflict, duplicate, health checks | `feature/lineage`, `feature/license-checks`, `feature/duplicates`, `feature/health` | **v0.2.0** | ⏳ |
 | 6 | Trust score | `feature/trust-score` | **v0.3.0** | ⏳ |
 | 7 | API | `feature/api` | **v0.4.0** | ⏳ |
@@ -285,8 +285,8 @@ Tests are written **alongside** every step; Step 9 adds automation (CI), coverag
 | 4.3 | Split README cards into sections | ✅ | 3 |
 | 4.4 | Find licenses written inside README text | ✅ | 4 (+ handbook) |
 | 4.5 | Spark cleaning job: raw JSONL → clean Parquet | ✅ | 3 (+ handbook) |
-| 4.6 | `likely_not_a_dataset` flag + Spark tests in Docker | ⏭️ **Next** | — |
-| 4.7 | Push, PR, merge, tag `v0.1.0` | ⏳ | — |
+| 4.6 | `likely_not_a_dataset` flag + Spark tests in Docker | ✅ | 2 (+ handbook; flag code went into 4.5's commits) |
+| 4.7 | Push, PR, merge, tag `v0.1.0` | ⏭️ **Next** | — |
 
 ## 14. Git and version-control rules
 
@@ -378,6 +378,7 @@ python -m datatrust.collector.run_collect         # collect (options: --limit N,
 docker compose build pipeline                     # build/refresh the Spark image
 docker compose run --rm pipeline python -m datatrust.pipelines.inspect_raw
 docker compose run --rm pipeline python -m datatrust.pipelines.clean_metadata   # raw → data/clean/datasets.parquet
+docker compose run --rm pipeline pytest                    # ALL tests incl. Spark tests (Windows skips them)
 docker compose run --rm pipeline python -c "import pyspark; print(pyspark.__version__)"
 
 # ---- Quick data checks (PowerShell) ----
@@ -485,13 +486,13 @@ datatrust/
 │
 ├── data/                         Data (big files NOT in Git)
 │   ├── raw/                      ✅ datasets.jsonl + cards.jsonl (gitignored, 54.5 MB)
-│   ├── clean/                    ✅ datasets.parquet (5,000 rows, 2.3 MB, gitignored)
+│   ├── clean/                    ✅ datasets.parquet (5,000 rows, 34 columns, 2.3 MB, gitignored)
 │   ├── output/                   ✅ folder (scores/reports later)
 │   ├── samples/                  ✅ folder (small committed samples later)
 │   └── labels/                   ✅ folder; lineage_gold.csv + LABELING_GUIDE.md ⏳ (Step 5)
 │
 ├── docker/
-│   └── spark.Dockerfile          ✅ Python 3.12 + Java 17 + PySpark
+│   └── spark.Dockerfile          ✅ Python 3.12 + Java 17 + PySpark + pytest/ruff (4.6)
 │
 ├── scripts/                      ⏳ run_local.ps1 / run_local.sh / make_sample.py
 │
@@ -507,7 +508,9 @@ datatrust/
 │   ├── test_normalize_license.py ✅ 12 tests
 │   ├── test_parse_cards.py       ✅ 16 tests
 │   ├── test_license_from_text.py 🆕✅ 20 tests
-│   ├── test_clean_rules.py       🆕✅ 9 tests
+│   ├── test_clean_rules.py       🆕✅ 13 tests
+│   ├── spark/__init__.py         🆕✅ Spark tests package (skipped on Windows)
+│   ├── spark/test_clean_metadata_spark.py 🆕✅ 7 tests that run the real Spark job (Docker)
 │   └── test_extract_links.py, test_license_conflicts.py, test_duplicates.py,
 │       test_health.py, test_trust_score.py, test_api.py      ⏳
 │
@@ -550,7 +553,10 @@ datatrust/
 | Dataset licensing knowledge | Permissive / share-alike / non-commercial / no-derivatives | Step 4.2 | ✅ |
 | Data cleaning → Parquet | Typed, compressed column tables written by Spark | Step 4.5 | ✅ |
 | Data quality checks | Row counts, unique keys, required fields checked before saving | Step 4.5 | ✅ |
-| Separating logic from the engine | Plain-Python rules tested on Windows, called by Spark | Steps 4.2–4.5 | ✅ |
+| Separating logic from the engine | Plain-Python rules tested on Windows, called by Spark | Steps 4.2–4.6 | ✅ |
+| Cross-row rules with Spark | `groupBy` + `agg` per author, joined back to every row | Step 4.6 | ✅ |
+| Testing Spark code | Session fixture, tiny hand-made input files, `collect()`, skipping where Spark is missing | Step 4.6 | ✅ |
+| Heuristic design from data | Comparing candidate rules/thresholds on real data before choosing | Step 4.6 | ✅ |
 | Graph building | Lineage nodes/edges, walking a graph | Step 5 | ⏳ |
 | Similarity search | MinHash LSH for near-duplicates at scale | Step 5 | ⏳ |
 | Evaluation metrics | Precision and recall on a hand-labeled set | Step 5 | ⏳ |
@@ -580,7 +586,10 @@ datatrust/
 | `cache()` (Spark) | Keep a computed table in memory so later steps reuse it instead of recomputing it. |
 | `coalesce(1)` (Spark) | Merge all partitions into one before writing, so the output is a single file. (Not the same as `F.coalesce`, which picks the first non-empty value.) |
 | Commit | A saved snapshot of your files with a message. |
+| `collect()` (Spark) | Bring a (small!) Spark table back into plain Python as a list of rows. |
 | Container / Image | An image is a packaged Linux "box"; a container is one running copy of it. |
+| Aggregation (`groupBy` + `agg`) | Squash many rows into one per group, e.g. count repos per author. |
+| Heuristic | A practical rule of thumb that is usually right but not always (like our not-a-dataset flag). |
 | DataFrame | A table with named columns that Spark spreads across CPU cores. |
 | Embedding | A list of numbers that represents the *meaning* of a text, so similar texts get similar numbers. |
 | Hallucination | When an AI model states something confidently that is not true. |
@@ -608,6 +617,7 @@ datatrust/
 | Precision / Recall | Of the links we found, how many were right / of the real links, how many we found. |
 | Pull Request (PR) | A GitHub page asking to merge a branch into `main`. |
 | Rate limit | The maximum requests a server allows in a time window (HF: per 5 minutes). |
+| Skip (pytest) | A test that is deliberately not run in some environments, and reported as "skipped". |
 | Regex | A mini-language for describing text patterns. |
 | Remote (`origin`) | The online copy of the repo on GitHub. |
 | Schema | The list of columns in a table and the type of each. |
@@ -916,6 +926,59 @@ test: add cleaning rules tests
 feat: add Spark cleaning job writing clean Parquet
 ```
 
+### Step 4.6 — `likely_not_a_dataset` flag + Spark tests in Docker ✅ (2026-11-23)
+
+**Goal:** label the repos that are probably not real datasets (file hosting, model-weight dumps, spam), with
+the reasons, and add the first automated tests that actually start Spark.
+
+**What the data showed first (why the planned rule changed):** the plan said "no README + no card metadata +
+no description". But without a README there is nothing else either (0 have card metadata, 4 have a
+description), so that rule would just mean "no README" — and some undocumented repos look like real data
+(`ThomasTheMaker/ptb-xl-ecg`). Two extra pieces of evidence separate junk from real-but-undocumented:
+- **`not_loadable`** — HF cannot load it as a dataset (no `library:datasets` tag): a pile of files.
+- **`bulk_uploader`** — the owner has ≥ 10 repos in our list and a README on **none** of them
+  (`icdn10`…`icdn22` and `onfdata` image hosting — all named `content-2026…` — plus `atokforps`, `nightgoodl`).
+Thresholds 5 / 10 / 20 were compared; 10 catches the hosting accounts without catching real organisations.
+
+**How the code works:**
+- `clean_rules.py` → `not_a_dataset_reasons(has_card, tags, is_bulk_uploader)` (plain Python): a documented
+  repo is never flagged; otherwise returns the list of reasons. Constants `BULK_UPLOAD_MIN_REPOS = 10`,
+  `LOADABLE_TAG = "library:datasets"`. 4 new tests in `tests/test_clean_rules.py` (13 in total).
+- `clean_metadata.py`:
+  - `find_bulk_uploaders()` — a **cross-row** rule, so it is Spark, not per-row Python: `groupBy("author")`
+    → `count("*")` and `sum(has_card as 0/1)` → keep authors with ≥ 10 repos and 0 documented.
+  - `add_not_a_dataset_flag()` — left-joins that list back by author (missing → `False`), runs
+    `not_a_dataset_reasons` as a UDF, and sets `likely_not_a_dataset = size(reasons) > 0`.
+  - The summary now prints the flag counts. The table grows to **34 columns**.
+- `docker/spark.Dockerfile` — new last step installs `requirements-dev.txt` (pytest, ruff) **after** PySpark,
+  so changing test tools never re-downloads PySpark.
+- `tests/spark/test_clean_metadata_spark.py` — 7 tests that run the **real** Spark job on a tiny hand-made
+  raw folder (a documented dataset, an undocumented-but-loadable repo, a file dump, and 10 bulk-uploaded repos),
+  plus two tests proving `check_quality()` stops duplicates and lost rows.
+  `pytest.importorskip("pyspark")` makes the file **skip** on Windows (no PySpark there) and run in Docker.
+
+**Results on the real data:** 1,689 of 5,000 repos (**34%**) flagged — `not_loadable` 1,252, `bulk_uploader`
+354, both 83 — and they account for **23.5% of all downloads** in the top 5,000. (1,252 vs an earlier quick
+estimate of 1,246: the job treats an `ok` download with empty text as "no README".)
+
+**Commands:**
+```
+pytest                                                     # Windows: 95 passed, 1 skipped (Spark file)
+ruff check .                                               # All checks passed!
+docker compose build pipeline                              # adds pytest/ruff to the image (~4 min this time)
+docker compose run --rm pipeline pytest                    # Docker: 102 passed (incl. 7 Spark tests)
+docker compose run --rm pipeline python -m datatrust.pipelines.clean_metadata
+```
+
+**Commits:** the flag code in `clean_rules.py`, `clean_metadata.py` and `tests/test_clean_rules.py` went into
+Step 4.5's commits (`319b85c`, `c83e261`, `2748946`), because those were made while 4.6 was being written —
+nothing is missing, the messages just don't mention the flag. Remaining commits:
+```
+build: add test tools to the Spark image
+test: add Spark tests for the cleaning job
+docs: update project handbook for step 4.6
+```
+
 ### Progress report / handbook (2026-11-05)
 
 - Commit `docs: add progress report` added `docs/PROGRESS.md`.
@@ -935,8 +998,7 @@ git status        # must say "nothing to commit, working tree clean"
 
 | Step | Goal | Main files |
 |---|---|---|
-| **4.6** | `likely_not_a_dataset` flag (no README + no card metadata + no description); Spark tests in Docker | flag logic, Spark tests |
-| 4.7 | Push, PR, merge, tag `v0.1.0` | — |
+| **4.7** | Push `feature/cleaning`, Pull Request, merge, tag `v0.1.0` | — |
 | 5 | Lineage graph, license conflicts, near-duplicates (MinHash LSH), health; hand-labeled lineage set with precision/recall | `lineage/`, `checks/`, `data/labels/` |
 | 6 | Trust score + "why this score" | `scoring/`, `score_weights.yaml` |
 | 7 | FastAPI API + legal notice | `api/` |
@@ -980,6 +1042,8 @@ From the top 5,000 datasets (collected 2026-10-18):
   **1,501 (30%)** had not been updated for over a year; the oldest update was 1,930 days earlier.
 - **Access:** 148 datasets are gated (121 automatic approval, 27 manual approval).
 - **Lineage field:** 268 datasets fill `source_datasets`, often with just `["original"]` (meaning not derived).
+- **Not real datasets (Step 4.6):** 1,689 of the top 5,000 (**34%**) are flagged `likely_not_a_dataset`, and they
+  receive **23.5% of all downloads** in the top 5,000 — download counts are heavily inflated by file hosting.
 
 Headline for the README: *"Of the 5,000 most-downloaded datasets on Hugging Face, 39% have no documentation at all,
 and only about 1 in 3 has a clearly usable license."*
@@ -1003,6 +1067,10 @@ and only about 1 in 3 has a clearly usable license."*
 - The cleaning step uses a Python UDF, which is slower than built-in Spark functions; fine at 5,000 rows (~50 s),
   worth revisiting (e.g. pandas UDFs) if the collection grows to 50k+.
 - `description_text` and `sources_text` are cut at 10,000 characters.
+- `likely_not_a_dataset` is a heuristic. Known misses: single-repo hosting such as `BuLei/imgbed` (loadable,
+  one repo, so neither reason fires); odd loadable video repos (`Dagonulca/figofigofigofigo`). Possible false
+  positives: real data split into many undocumented parts (`nightgoodl/lasa1m-annotate-part-*`). The bulk
+  threshold (10) only sees repos inside our top-5,000 list, not the owner's whole account.
 
 ## 28. Side work: PySpark on Windows for practice
 
@@ -1046,6 +1114,9 @@ on `Path`. These come from community repos (third-party binaries — your choice
 - Noticed the handbook file was still untracked; its commit is included in Step 4.4's commit list.
 - Step 4.5 done: `clean_rules.py` (plain Python) + `clean_metadata.py` (Spark job), 9 tests, total 91.
   First clean table: `data/clean/datasets.parquet` (5,000 rows, 32 columns, 2.3 MB, 0 bad dates).
+- Step 4.6 done: `likely_not_a_dataset` flag (reasons `not_loadable` / `bulk_uploader`; 1,689 repos, 34%),
+  pytest added to the Docker image, first Spark tests (7). Windows 95 passed + 1 skipped; Docker 102 passed.
+  The 4.5 commits were made mid-way and already contain the flag code (recorded in the 4.6 entry).
 
 ### 2026-11-07
 - Question: can RAG, MCP or similar AI ideas be used? Evaluated 8 scenarios against our real data,
