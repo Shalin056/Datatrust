@@ -1,0 +1,144 @@
+# license_aliases.yaml — the many ways people WRITE a license name in README text,
+# mapped to our license IDs (the IDs in configs/licenses.yaml).
+# Read by: datatrust/pipelines/license_from_text.py
+#
+# Matching rules (done in code, so you can write aliases naturally here):
+#   - case is ignored, and every symbol (- . / _ ( ) etc.) counts as a space,
+#     so "CC BY-NC-SA 4.0", "cc-by-nc-sa-4.0" and "CC BY NC SA 4.0" are all the same;
+#   - longer aliases are matched first, so "CC BY-NC 4.0" is never also counted as "CC BY 4.0";
+#   - aliases must match whole words ("mit" never matches inside "permit").
+# Aliases were chosen from the 111 real License sections in our first collection.
+
+aliases:
+  # ---------- Creative Commons ----------
+  cc0-1.0:
+    - cc0
+    - cc0 1.0
+    - creative commons zero
+    - publicdomain/zero/1.0
+  cc-by-2.0:
+    - cc by 2.0
+    - creative commons attribution 2.0
+    - creativecommons.org/licenses/by/2.0
+  cc-by-3.0:
+    - cc by 3.0
+    - creative commons attribution 3.0
+    - creativecommons.org/licenses/by/3.0
+  cc-by-4.0:
+    - cc by 4.0
+    - creative commons attribution 4.0
+    - creativecommons.org/licenses/by/4.0
+  cc-by-sa-3.0:
+    - cc by sa 3.0
+    - creative commons attribution sharealike 3.0
+    - creative commons attribution share alike 3.0
+    - creativecommons.org/licenses/by-sa/3.0
+  cc-by-sa-4.0:
+    - cc by sa 4.0
+    - creative commons attribution sharealike 4.0
+    - creative commons attribution share alike 4.0
+    - creativecommons.org/licenses/by-sa/4.0
+  cc-by-nc-2.0:
+    - cc by nc 2.0
+    - creativecommons.org/licenses/by-nc/2.0
+  cc-by-nc-4.0:
+    - cc by nc 4.0
+    - creative commons attribution noncommercial 4.0
+    - creative commons attribution non commercial 4.0
+    - creativecommons.org/licenses/by-nc/4.0
+  cc-by-nc-sa-2.0:
+    - cc by nc sa 2.0
+    - creativecommons.org/licenses/by-nc-sa/2.0
+  cc-by-nc-sa-4.0:
+    - cc by nc sa 4.0
+    - creative commons attribution noncommercial sharealike 4.0
+    - creative commons attribution non commercial share alike 4.0
+    - creativecommons.org/licenses/by-nc-sa/4.0
+  cc-by-nc-nd-4.0:
+    - cc by nc nd 4.0
+    - creative commons attribution noncommercial noderivatives 4.0
+    - creativecommons.org/licenses/by-nc-nd/4.0
+  cc-by-nd-4.0:
+    - cc by nd 4.0
+    - creative commons attribution noderivatives 4.0
+    - creativecommons.org/licenses/by-nd/4.0
+
+  # ---------- Software-style licenses ----------
+  mit:
+    - mit
+    - mit license
+    - opensource.org/licenses/mit
+  apache-2.0:
+    - apache 2.0
+    - apache license 2.0
+    - apache license version 2.0
+    - apache 2
+    - apache2
+    - apache.org/licenses/license-2.0
+  bsd:
+    - bsd
+    - bsd license
+  bsd-3-clause:
+    - bsd 3 clause
+  gpl-3.0:
+    - gpl 3.0
+    - gplv3
+    - gnu general public license v3
+  agpl-3.0:
+    - agpl 3.0
+    - agplv3
+
+  # ---------- Open Data Commons ----------
+  odc-by:
+    - odc by
+    - odc by 1.0
+    - open data commons attribution
+  odbl:
+    - odbl
+    - open database license
+
+# Phrases that change the meaning of the whole License section.
+signals:
+  # The dataset is made of parts that each keep their own license.
+  # (The code also treats 3 or more different licenses in one section as "mixed".)
+  mixed:
+    - each of the publicly available sub datasets
+    - governed by its own original license
+    - retains its original license
+    - its own license
+    - their own licenses
+    - own licenses
+    - their respective licenses
+    - mixture of licenses
+    - variety of licenses
+    - individual licenses
+    - strictly follow those of
+    - strictly follows those of
+    - refer to the original dataset
+    - licenses of the original
+    - license of any of the underlying data
+    - remains subject to
+    - no dataset wide
+    - various
+  # The authors restrict use beyond any standard license.
+  restricted:
+    - all rights reserved
+    - no re distribution
+    - not openly licensed
+    - academic use only
+    - research use only
+    - free for research use
+    - non commercial research
+  # The authors use their own license or extra terms instead of (or on top of) a standard one.
+  custom:
+    - modified mit license
+    - community license
+    - data agreement
+    - license agreement
+    - terms of use
+    - terms and conditions
+  # The authors say plainly that there is no license.
+  none:
+    - not specified
+    - no licence has been chosen
+    - no license has been chosen
