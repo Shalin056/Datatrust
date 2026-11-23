@@ -118,6 +118,21 @@ def test_placeholder_is_not_real_content():
     assert has_real_content(FILLER) is True
 
 
+def test_placeholder_link_is_not_real_content():
+    # Real text from many HF cards (e.g. allenai/winogrande's License section).
+    text = "[More Information Needed](https://github.com/huggingface/datasets/blob/master/CONTRIBUTING.md)"
+    assert has_real_content(text) is False
+
+
+def test_html_comment_is_not_real_content():
+    assert has_real_content("<!-- choose a license here -->") is False
+
+
+def test_link_text_still_counts():
+    # The words of a link are real content even though the address is dropped.
+    assert has_real_content("[MIT](LICENSE)") is True
+
+
 def test_short_real_answer_counts():
     # A License section that only says "MIT" is a real, complete answer.
     assert has_real_content("MIT") is True

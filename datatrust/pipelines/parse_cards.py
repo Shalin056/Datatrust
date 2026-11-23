@@ -20,7 +20,8 @@ SECTIONS_FILE = PROJECT_ROOT / "configs" / "card_sections.yaml"
 
 # Filler text that means "nobody wrote this section". The first one is what HF's card
 # template puts in every empty section (198 of our real cards still contain it).
-PLACEHOLDERS = ["[more information needed]", "tbd", "todo", "n/a", "coming soon"]
+# Written without brackets so it also matches after links are turned into plain words.
+PLACEHOLDERS = ["more information needed", "tbd", "todo", "n/a", "coming soon"]
 # After removing filler, a section needs at least this many characters to count.
 # Kept small on purpose: a License section that just says "MIT" is a real answer.
 MIN_SECTION_CHARS = 3
@@ -118,6 +119,12 @@ def section_for_heading(heading, keywords):
 # Returns: True or False.
 def has_real_content(text):
     cleaned = (text or "").lower()
+    # Hidden HTML comments (<!-- ... -->) are not visible content, so drop them.
+    cleaned = re.sub(r"<!--.*?-->", " ", cleaned, flags=re.DOTALL)
+    # Markdown links "[words](address)" -> keep only "words". Without this, HF's template
+    # text "[More Information Needed](https://github.com/...)" counted as real content
+    # because of the letters in the address.
+    cleaned = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", cleaned)
     for placeholder in PLACEHOLDERS:
         cleaned = cleaned.replace(placeholder, "")
     # Ignore leftover punctuation/spaces, e.g. "[More Information Needed]." leaves ".".
