@@ -1,0 +1,12 @@
+# .dockerignore — files Docker must NOT copy when building an image.
+# Why: keeps secrets out of images, and keeps builds fast (data/ can be hundreds of MB).
+# (The project folder is still mounted at RUN time by docker-compose; this only affects BUILD.)
+
+.env
+.git
+.venv
+data
+web/node_modules
+**/__pycache__
+.pytest_cache
+.ruff_cache

@@ -15,11 +15,36 @@ DataTrust checks all of this automatically and gives each dataset a **trust scor
 
 ## Status
 
-🚧 Early development. See the roadmap below.
+🚧 Early development — **v0.1.0: data pipeline working.** The top 5,000 most-downloaded datasets
+are collected from the Hugging Face API and cleaned by a Spark job into one Parquet table.
+
+### First findings (top 5,000 datasets, collected October 2026)
+
+- **39%** have no README at all.
+- **50%** state no license anywhere (tags or README text); only **~31%** have a clearly permissive license.
+- Only **18%** of READMEs say where the data came from, and only **15%** describe limitations or bias.
+- **34%** are flagged as *likely not a dataset* (file hosting, model-weight dumps) — and they receive
+  **23.5%** of all downloads in the top 5,000.
+
+### Try the pipeline locally
+
+Needs Python 3.12 and Docker Desktop.
+
+```bash
+python -m venv .venv
+.venv\Scripts\Activate.ps1          # Windows; on macOS/Linux: source .venv/bin/activate
+pip install -r requirements-dev.txt
+cp .env.example .env                # then add your free Hugging Face read token
+python -m datatrust.collector.run_collect --limit 50
+docker compose run --rm pipeline python -m datatrust.pipelines.clean_metadata
+pytest                              # Spark tests run inside Docker: docker compose run --rm pipeline pytest
+```
+
+Full design notes, decisions, and progress: [docs/PROJECT_HANDBOOK.md](docs/PROJECT_HANDBOOK.md).
 
 ## Roadmap
 
-- [ ] v0.1.0 — Collect and clean dataset metadata from the Hugging Face API
+- [x] v0.1.0 — Collect and clean dataset metadata from the Hugging Face API
 - [ ] v0.2.0 — Lineage graph, license-conflict, duplicate, and health checks
 - [ ] v0.3.0 — Trust score
 - [ ] v0.4.0 — Public JSON API (FastAPI)
