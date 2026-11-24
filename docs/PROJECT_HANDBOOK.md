@@ -15,17 +15,18 @@ _Last updated: 2026-11-23_
 | | |
 |---|---|
 | **Project** | DataTrust — a trust report (0–100 score) for every Hugging Face dataset |
-| **Current step** | Step 4 — Clean and store the data (4.1–4.6 done; 4.7 prepared, waiting on you) |
-| **Current branch** | `feature/cleaning` — 24 commits (+1 README/handbook commit to make), ready to push and merge |
+| **Current step** | Step 4 ✅ complete (v0.1.0). Step 5 — checks — not started |
+| **Current branch** | `main` at `1ee7d7d` (PR #2 merged). Step 5 will start a new feature branch |
 | **Tests** | Windows: 95 passed + 1 Spark file skipped · Docker: 102 passed (incl. 7 Spark tests) · lint clean |
 | **Data collected** | Top 5,000 HF datasets by downloads + 5,000 README cards (54.5 MB, 2026-10-18) |
 | **Clean data** | `data/clean/datasets.parquet` — 5,000 rows, 34 columns (incl. `likely_not_a_dataset`), 2.3 MB |
-| **Last version tag** | none yet — `v0.1.0` comes at the end of Step 4 |
-| **Next action** | You: Step 4.7 commands (push, PR, merge, tag `v0.1.0`). Then Step 5 — checks |
+| **Last version tag** | **`v0.1.0`** on `1ee7d7d` — data pipeline (collect + clean). Next: `v0.2.0` after Step 5 |
+| **Next action** | Step 5 — lineage, license-conflict, duplicate and health checks |
 
 ### Waiting on you
-- [ ] Run the Step 4.7 commands: commit, push, PR #2, merge, tag `v0.1.0`
-      (see [Step 4.7](#step-47--push-pull-request-merge-tag-v010--prepared-2026-11-23-waiting-on-you)).
+- [ ] Commit this handbook update on `main` and push it
+      (see [Step 4.7](#step-47--push-pull-request-merge-tag-v010--2026-11-23)).
+- [ ] Optional: create the GitHub Release for `v0.1.0` (Releases → Draft a new release → tag `v0.1.0`).
 - [ ] Decide which optional AI features to include ([section 30](#30-rag-mcp-and-embeddings-in-datatrust)).
 - [ ] Later (after Step 10): decide whether to add an optional AWS or Google Cloud "mirror" ([section 25](#25-steps-still-to-do)).
 - [ ] Optional side work: confirm the Windows PySpark practice setup works ([section 28](#28-side-work-pyspark-on-windows-for-practice)).
@@ -265,7 +266,7 @@ Steps are split into small sub-steps (1–3 files each), each with a code walkth
 | 1 | Project plan + folder structure | — | — | ✅ |
 | 2 | Git, GitHub, first commit | `main` | — | ✅ |
 | 3 | Collect the data | `feature/collector` | — | ✅ (PR #1) |
-| 4 | Clean and store the data | `feature/cleaning` | **v0.1.0** | 🔄 4.1–4.6 done |
+| 4 | Clean and store the data | `feature/cleaning` | **v0.1.0** | ✅ (PR #2, tagged) |
 | 5 | Lineage, license-conflict, duplicate, health checks | `feature/lineage`, `feature/license-checks`, `feature/duplicates`, `feature/health` | **v0.2.0** | ⏳ |
 | 6 | Trust score | `feature/trust-score` | **v0.3.0** | ⏳ |
 | 7 | API | `feature/api` | **v0.4.0** | ⏳ |
@@ -286,7 +287,7 @@ Tests are written **alongside** every step; Step 9 adds automation (CI), coverag
 | 4.4 | Find licenses written inside README text | ✅ | 4 (+ handbook) |
 | 4.5 | Spark cleaning job: raw JSONL → clean Parquet | ✅ | 3 (+ handbook) |
 | 4.6 | `likely_not_a_dataset` flag + Spark tests in Docker | ✅ | 2 (+ handbook; flag code went into 4.5's commits) |
-| 4.7 | Push, PR, merge, tag `v0.1.0` | 🔄 prepared, waiting on you | 1 |
+| 4.7 | Push, PR, merge, tag `v0.1.0` | ✅ | 1 + merge + tag |
 
 ## 14. Git and version-control rules
 
@@ -533,7 +534,8 @@ datatrust/
 | Skill | What it means | Where | Status |
 |---|---|---|---|
 | Project planning & architecture | Breaking a product into steps and components | Step 1 | ✅ |
-| Git & GitHub flow | Branches, small commits, PRs, merge commits, annotated version tags, releases | Steps 2+ | ✅ (first tag in 4.7) |
+| Git & GitHub flow | Branches, small commits, PRs, merge commits, annotated version tags, releases | Steps 2+ | ✅ |
+| Git recovery | Spotting a missed merge, deleting a wrong tag locally and remotely, re-tagging | Step 4.7 | ✅ |
 | Secrets handling | `.env`, `.gitignore`, noreply email, tokens never in code | Steps 2–3 | ✅ |
 | Python packaging basics | Packages, modules, `python -m`, `pyproject.toml` | Step 3 | ✅ |
 | Virtual environments | Isolated libraries per project (`.venv`) | Step 3 | ✅ |
@@ -602,6 +604,7 @@ datatrust/
 | Vector search | Finding the stored embeddings closest to a query's embedding. |
 | Dataset card | A dataset's README.md on HF: a YAML header plus free text. |
 | `explode` | Spark function that turns one row with a list into one row per list item. |
+| Fast-forward (Git) | Updating a branch by simply moving it ahead to newer commits, with no merge needed. |
 | Fixture (pytest) | Shared setup that tests can ask for by name. |
 | Front matter | The YAML block between the first two `---` lines of a card. |
 | HDFS / Hadoop | A system for spreading files across many computers (not needed here). |
@@ -981,7 +984,7 @@ test: add Spark tests for the cleaning job
 docs: update project handbook for step 4.6
 ```
 
-### Step 4.7 — Push, Pull Request, merge, tag `v0.1.0` 🔄 (prepared 2026-11-23, waiting on you)
+### Step 4.7 — Push, Pull Request, merge, tag `v0.1.0` ✅ (2026-11-23)
 
 **Goal:** finish Step 4 the professional way — the whole branch reviewed as one Pull Request, merged into
 `main`, and the milestone marked with the project's first **version tag**, `v0.1.0`.
@@ -1009,7 +1012,21 @@ and a message), the recommended kind for releases. Tags are not pushed by `git p
 its own `git push origin v0.1.0`.
 
 **Done when:** `git ls-remote --tags origin` shows `v0.1.0`, and `main` contains the merge commit for PR #2.
-(Verified and marked ✅ at the start of the next session.)
+
+**What actually happened (a real Git lesson):**
+1. The branch was pushed, but the Pull Request was **not merged** before the next commands.
+2. `git pull` said "Already up to date" and `git branch -d` warned "not yet merged to HEAD" — both signs that
+   `main` did not have the Step 4 work yet.
+3. So `git tag` marked the commit `main` was on: the **old Step 3 merge** `6575768`.
+4. **Fix:** merged PR #2 on GitHub; deleted the wrong tag (`git tag -d v0.1.0` and
+   `git push origin --delete v0.1.0` — acceptable only because it was minutes old and nobody used it;
+   published tags should normally never be moved); `git pull` fast-forwarded `main` to `1ee7d7d`
+   (24 files); re-created and pushed the tag.
+5. **Result (verified):** `main` = `refs/tags/v0.1.0^{}` = `1ee7d7d` "Merge pull request #2 from
+   Shalin056/feature/cleaning"; `feature/cleaning` deleted on GitHub; Windows tests still 95 passed + 1 skipped.
+
+**Lesson:** if `git pull` says "Already up to date" right after you think you merged, stop and check the PR page.
+Always tag **after** the merge has arrived on your laptop.
 
 ### Progress report / handbook (2026-11-05)
 
@@ -1030,8 +1047,7 @@ git status        # must say "nothing to commit, working tree clean"
 
 | Step | Goal | Main files |
 |---|---|---|
-| **4.7** | Push `feature/cleaning`, Pull Request, merge, tag `v0.1.0` (prepared, waiting on you) | — |
-| 5 | Lineage graph, license conflicts, near-duplicates (MinHash LSH), health; hand-labeled lineage set with precision/recall | `lineage/`, `checks/`, `data/labels/` |
+| **5** | Lineage graph, license conflicts, near-duplicates (MinHash LSH), health; hand-labeled lineage set with precision/recall | `lineage/`, `checks/`, `data/labels/` |
 | 6 | Trust score + "why this score" | `scoring/`, `score_weights.yaml` |
 | 7 | FastAPI API + legal notice | `api/` |
 | 8 | React website + badge | `web/`, `export/` |
@@ -1149,8 +1165,9 @@ on `Path`. These come from community repos (third-party binaries — your choice
 - Step 4.6 done: `likely_not_a_dataset` flag (reasons `not_loadable` / `bulk_uploader`; 1,689 repos, 34%),
   pytest added to the Docker image, first Spark tests (7). Windows 95 passed + 1 skipped; Docker 102 passed.
   The 4.5 commits were made mid-way and already contain the flag code (recorded in the 4.6 entry).
-- Step 4.7 prepared: README now shows v0.1.0 status, first findings and local run steps; push/PR/merge/tag
-  commands handed over (to verify next session).
+- Step 4.7 done: README shows v0.1.0 status, first findings and local run steps. PR #2 merged; first tag
+  attempt landed on the old Step 3 commit because the PR was not merged yet → wrong tag deleted, PR merged,
+  re-tagged. Verified: `main` = `v0.1.0` = `1ee7d7d`. **Step 4 complete.**
 
 ### 2026-11-07
 - Question: can RAG, MCP or similar AI ideas be used? Evaluated 8 scenarios against our real data,
